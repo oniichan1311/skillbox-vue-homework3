@@ -3,7 +3,7 @@
       <ProductItem v-for="(product, index) in products"
           v-bind:product="product"
           v-bind:index="index"
-          v-bind:key="index">
+          v-bind:key="product.id">
       </ProductItem>
     </ul>
 </template>
