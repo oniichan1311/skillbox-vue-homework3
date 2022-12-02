@@ -16,11 +16,11 @@
 
       <ul class="colors colors--black">
         <li class="colors__item" v-for="itemColor in product.colors"
-        v-bind:key="product.id + '-' + itemColor">
-          <label class="colors__label" :for="'color-'+ product.id + '-' + itemColor">
-            <input class="colors__radio sr-only" type="radio" v-model="checkedColor"
-            :value="itemColor" :id="'color-'+ product.id + '-' + itemColor">
-            <span class="colors__value" v-bind:style="{backgroundColor: itemColor}">
+        v-bind:key="product.id + '-' + itemColor.code">
+          <label class="colors__label" :for="'color-'+ product.id + '-' + itemColor.code">
+            <input class="colors__radio sr-only" type="radio" v-model="checkedColor.code"
+            :value="itemColor.code" :id="'color-'+ product.id + '-' + itemColor.code">
+            <span class="colors__value" v-bind:style="{backgroundColor: itemColor.code}">
             </span>
           </label>
         </li>

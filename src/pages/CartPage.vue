@@ -1,6 +1,6 @@
 <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
 <template>
-  <main class="content container">
+  <main class="content container" >
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -22,8 +22,10 @@
         {{totalProducts}} товара
       </span>
     </div>
-
-    <section class="cart">
+    <div v-if="cartLoading">
+      <PreloaderIndicator/>
+    </div>
+    <section class="cart" v-else>
       <form class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <ul class="cart__list">
@@ -50,16 +52,36 @@
 
 <script>
 import numberFormat from '@/helpers/numberFormat';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import CartItem from '@/components/CartItem.vue';
+import PreloaderIndicator from '@/components/PreloaderIndicator.vue';
 
 export default {
-  components: { CartItem },
+  components: { CartItem, PreloaderIndicator },
+  data() {
+    return {
+      cartLoading: false,
+    };
+  },
   filters: {
     numberFormat,
   },
   computed: {
     ...mapGetters({ products: 'cartDatailProducts', totalPrice: 'cartTotalPrice', totalProducts: 'cartTotalProducts' }),
+  },
+  methods: {
+    ...mapActions(['loadCart']),
+    loadCartItems() {
+      this.cartLoading = true;
+      clearTimeout(this.loadCartTimer);
+      this.loadCartTimer = setTimeout(() => {
+        this.loadCart()
+          .then(() => { this.cartLoading = false; });
+      }, 3000);
+    },
+  },
+  created() {
+    this.loadCartItems();
   },
 };
 </script>

@@ -33,11 +33,11 @@
           <fieldset class="form__block">
             <legend class="form__legend">Цвет</legend>
             <ul class="colors">
-              <li class="colors__item" v-for="color in colors" v-bind:key="color">
-                <label class="colors__label" :for="color">
+              <li class="colors__item" v-for="color in colors" v-bind:key="color.id">
+                <label class="colors__label" :for="color.id">
                   <input class="colors__radio sr-only" type="radio"
-                  name="color" v-model="currentColor" :value="color" :id="color">
-                  <span class="colors__value" :style="{backgroundColor: color}">
+                  name="color" v-model="currentColor" :value="color.id" :id="color.id">
+                  <span class="colors__value" :style="{backgroundColor: color.code}">
                   </span>
                 </label>
               </li>
@@ -118,8 +118,8 @@
 </template>
 
 <script>
-import categories from '../database/categories';
-import colors from '../database/colors';
+import { API_BASE_URL } from '@/config';
+import axios from 'axios';
 
 export default {
   data() {
@@ -128,15 +128,19 @@ export default {
       currentPriceTo: 0,
       currentCategoryId: 0,
       currentColor: 0,
+      categoriesData: null,
+      colorsData: null,
     };
   },
   props: ['priceFrom', 'priceTo', 'categoryId', 'productColor'],
   computed: {
     categories() {
-      return categories;
+      return this.categoriesData ? this.categoriesData.items : [];
     },
     colors() {
-      return colors;
+      return this.colorsData ? this.colorsData.items
+        .filter((item) => item.id === this.colorsData.items.indexOf(item) + 1) : [];
+      // фильтрация здесь чтобы не выводился последний повторяющийся элемент в title которого алерт
     },
   },
   watch: {
@@ -166,6 +170,18 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:productColor', 0);
     },
+    loadCategories() {
+      axios.get(`${API_BASE_URL}/api/productCategories`)
+        .then((response) => { this.categoriesData = response.data; });
+    },
+    loadColors() {
+      axios.get(`${API_BASE_URL}/api/colors`)
+        .then((response) => { this.colorsData = response.data; });
+    },
+  },
+  created() {
+    this.loadCategories();
+    this.loadColors();
   },
 };
 </script>

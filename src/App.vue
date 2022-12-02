@@ -2,7 +2,9 @@
   <div>
   <header class="header">
     <div class="header__wrapper container">
-      <span class="header__info">Каталог</span>
+        <router-link class="header__info" :to="{name:'main'}">
+            Каталог
+        </router-link>
 
       <a class="header__logo" href="#">
         <img src="img/svg/logo-tech.svg"
@@ -12,7 +14,8 @@
       <a class="header__tel" href="tel:8 800 600 90 09">
         8 800 600 90 09
       </a>
-      <CartIndicator/>
+      <PreloaderIndicator v-if="cartLoading" class="header__cart"/>
+      <CartIndicator v-else/>
     </div>
   </header>
   <router-view/>
@@ -111,10 +114,36 @@
 </template>
 
 <script>
+import { mapActions, mapMutations } from 'vuex';
 import CartIndicator from './components/CartIndicator.vue';
+import PreloaderIndicator from './components/PreloaderIndicator.vue';
 
 export default {
-  components: { CartIndicator },
+  data() {
+    return {
+      cartLoading: false,
+    };
+  },
+  components: { CartIndicator, PreloaderIndicator },
+  methods: {
+    ...mapActions(['loadCart']),
+    ...mapMutations(['updateUserAccessKey']),
+    loadCartItems() {
+      this.cartLoading = true;
+      clearTimeout(this.loadCartTimer);
+      this.loadCartTimer = setTimeout(() => {
+        this.loadCart()
+          .then(() => { this.cartLoading = false; });
+      }, 3000);
+    },
+  },
+  created() {
+    const userAccessKey = localStorage.getItem('userAccessKey');
+    if (userAccessKey) {
+      this.updateUserAccessKey(userAccessKey);
+    }
+    this.loadCartItems();
+  },
 };
 </script>
 
