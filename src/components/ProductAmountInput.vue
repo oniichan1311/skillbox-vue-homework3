@@ -22,7 +22,7 @@
 export default {
   data() {
     return {
-      currentAmount: 1,
+      currentAmount: this.productAmount,
     };
   },
   props: ['productAmount'],

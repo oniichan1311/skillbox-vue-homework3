@@ -22,8 +22,12 @@
         {{totalProducts}} товара
       </span>
     </div>
-    <div v-if="cartLoading">
+    <div v-if="$store.state.cartLoading">
       <PreloaderIndicator/>
+    </div>
+    <div v-else-if="$store.state.cartLoadingFailed">
+        <h3>Произошла ошибка при загрузке товаров</h3>
+        <button @click.prevent="loadProducts">Попробовать еще раз</button>
     </div>
     <section class="cart" v-else>
       <form class="cart__form form" action="#" method="POST">
@@ -58,11 +62,6 @@ import PreloaderIndicator from '@/components/PreloaderIndicator.vue';
 
 export default {
   components: { CartItem, PreloaderIndicator },
-  data() {
-    return {
-      cartLoading: false,
-    };
-  },
   filters: {
     numberFormat,
   },
@@ -71,17 +70,6 @@ export default {
   },
   methods: {
     ...mapActions(['loadCart']),
-    loadCartItems() {
-      this.cartLoading = true;
-      clearTimeout(this.loadCartTimer);
-      this.loadCartTimer = setTimeout(() => {
-        this.loadCart()
-          .then(() => { this.cartLoading = false; });
-      }, 3000);
-    },
-  },
-  created() {
-    this.loadCartItems();
   },
 };
 </script>

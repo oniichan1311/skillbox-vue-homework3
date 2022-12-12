@@ -163,7 +163,7 @@ import ProductAmountInput from '@/components/ProductAmountInput.vue';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config';
 import PreloaderIndicator from '@/components/PreloaderIndicator.vue';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   components: { ProductAmountInput, PreloaderIndicator },
@@ -181,6 +181,7 @@ export default {
     numberFormat,
   },
   computed: {
+    ...mapGetters({ cartProducts: 'cartDatailProducts' }),
     product() {
       return this.productData;
     },

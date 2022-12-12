@@ -10,6 +10,8 @@ export default new Vuex.Store({
     cartProducts: [],
     userAccessKey: null,
     cartProductsData: [],
+    cartLoading: false,
+    cartLoadingFailed: false,
   },
   mutations: {
     updateCartProductAmount(state, { productId, amount }) {
@@ -32,6 +34,12 @@ export default new Vuex.Store({
         productId: item.product.id,
         amount: item.quantity,
       }));
+    },
+    updateCartLoadingProcess(state, status) {
+      state.cartLoading = status;
+    },
+    updateCartLoadingFailed(state, status) {
+      state.cartLoadingFailed = status;
     },
   },
   getters: {
@@ -57,19 +65,30 @@ export default new Vuex.Store({
   },
   actions: {
     loadCart(context) {
-      axios.get(`${API_BASE_URL}/api/baskets`, {
-        params: {
-          userAccessKey: context.state.userAccessKey,
-        },
-      })
-        .then((response) => {
-          if (!context.state.userAccessKey) {
-            localStorage.setItem('userAccessKey', response.data.user.accessKey);
-            context.commit('updateUserAccessKey', response.data.user.accessKey);
-          }
-          context.commit('updateCartProductsData', response.data.items);
-          context.commit('syncCartProducts');
-        });
+      context.commit('updateCartLoadingProcess', true);
+      context.commit('updateCartLoadingFailed', false);
+      clearTimeout(this.loadCartTimer);
+      this.loadCartTimer = setTimeout(() => {
+        axios.get(`${API_BASE_URL}/api/baskets`, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+          .then((response) => {
+            if (!context.state.userAccessKey) {
+              localStorage.setItem('userAccessKey', response.data.user.accessKey);
+              context.commit('updateUserAccessKey', response.data.user.accessKey);
+            }
+            context.commit('updateCartProductsData', response.data.items);
+            context.commit('syncCartProducts');
+          })
+          .catch(() => {
+            context.commit('updateCartLoadingFailed', true);
+          })
+          .then(() => {
+            context.commit('updateCartLoadingProcess', false);
+          });
+      }, 3000);
     },
     addProductToCart(context, { productId, amount }) {
       return axios.post(`${API_BASE_URL}/api/baskets/products`, {

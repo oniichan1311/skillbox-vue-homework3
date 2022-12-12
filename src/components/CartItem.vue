@@ -15,7 +15,7 @@
     </span>
 
     <div class="product__counter form__counter">
-      <button type="button" aria-label="Убрать один товар">
+      <button type="button" aria-label="Убрать один товар" @click.prevent="decrease(amount)">
         <svg width="10" height="10" fill="currentColor">
           <use xlink:href="#icon-minus"></use>
         </svg>
@@ -23,7 +23,7 @@
 
       <input type="text" v-model.number="amount" name="count">
 
-      <button type="button" aria-label="Добавить один товар">
+      <button type="button" aria-label="Добавить один товар" @click.prevent="increase(amount)">
         <svg width="10" height="10" fill="currentColor">
           <use xlink:href="#icon-plus"></use>
         </svg>
@@ -67,6 +67,14 @@ export default {
     ...mapActions(['deleteCartProduct']),
     deleteCartProductItem(id) {
       this.deleteCartProduct({ productId: id });
+    },
+    increase(value) {
+      this.$store.dispatch('updateCartProductAmount', { productId: this.item.productId, amount: value + 1 });
+    },
+    decrease(value) {
+      if (value > 1) {
+        this.$store.dispatch('updateCartProductAmount', { productId: this.item.productId, amount: value - 1 });
+      }
     },
   },
 };

@@ -14,7 +14,7 @@
       <a class="header__tel" href="tel:8 800 600 90 09">
         8 800 600 90 09
       </a>
-      <PreloaderIndicator v-if="cartLoading" class="header__cart"/>
+      <PreloaderIndicator v-if="$store.state.cartLoading" class="header__cart"/>
       <CartIndicator v-else/>
     </div>
   </header>
@@ -119,30 +119,19 @@ import CartIndicator from './components/CartIndicator.vue';
 import PreloaderIndicator from './components/PreloaderIndicator.vue';
 
 export default {
-  data() {
-    return {
-      cartLoading: false,
-    };
-  },
   components: { CartIndicator, PreloaderIndicator },
   methods: {
     ...mapActions(['loadCart']),
-    ...mapMutations(['updateUserAccessKey']),
-    loadCartItems() {
-      this.cartLoading = true;
-      clearTimeout(this.loadCartTimer);
-      this.loadCartTimer = setTimeout(() => {
-        this.loadCart()
-          .then(() => { this.cartLoading = false; });
-      }, 3000);
-    },
+    ...mapMutations([
+      'updateUserAccessKey',
+    ]),
   },
   created() {
     const userAccessKey = localStorage.getItem('userAccessKey');
     if (userAccessKey) {
       this.updateUserAccessKey(userAccessKey);
     }
-    this.loadCartItems();
+    this.loadCart();
   },
 };
 </script>
